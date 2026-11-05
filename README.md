@@ -1,0 +1,1 @@
+# Automated-Bug-Bounty-Vulnerability-Patch-and-Payout-Ledger
