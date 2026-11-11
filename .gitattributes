@@ -1,0 +1,4 @@
+# Shell scripts must keep LF line endings or bash fails on WSL/Linux.
+* text=auto eol=lf
+*.ico binary
+*.png binary
