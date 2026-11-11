@@ -5,20 +5,23 @@ WHERE EXISTS(SELECT 1 FROM PROGRAM p WHERE p.company_id=c.company_id)
 AND NOT EXISTS(SELECT 1 FROM PROGRAM p WHERE p.company_id=c.company_id
  AND NOT EXISTS(SELECT 1 FROM VULNERABILITY v JOIN PATCH pt ON pt.vuln_id=v.vuln_id
  WHERE v.program_id=p.program_id AND pt.verification_status='VERIFIED')) ORDER BY c.name`},
-{id:"Q08",title:"Researcher leaderboard with ranking and ties",technique:"CTE + RANK() and DENSE_RANK() window functions",sql:`WITH earnings AS(
- SELECT r.researcher_id,r.name,r.country,
- COALESCE(SUM(CASE WHEN py.payment_status='COMPLETED' THEN py.amount END),0) earned,
+{id:"Q08",title:"Researcher earnings leaderboard ranked separately by currency",technique:"CTE + RANK() and DENSE_RANK() window functions",sql:`WITH earnings AS(
+ SELECT r.researcher_id,r.name,r.country,py.currency,
+ SUM(CASE WHEN py.payment_status='COMPLETED' THEN py.amount ELSE 0 END) earned,
  COUNT(DISTINCT CASE WHEN v.status='ACCEPTED' THEN v.vuln_id END) accepted
  FROM RESEARCHER r LEFT JOIN VULNERABILITY v ON v.researcher_id=r.researcher_id
  LEFT JOIN PAYOUT py ON py.vuln_id=v.vuln_id
- GROUP BY r.researcher_id,r.name,r.country)
-SELECT RANK() OVER(ORDER BY earned DESC) earnings_rank,DENSE_RANK() OVER(ORDER BY accepted DESC) accepted_rank,
- name,country,earned,accepted FROM earnings ORDER BY earnings_rank,name`},
-{id:"Q09",title:"Monthly completed payouts with a running total",technique:"CTE + SUM() OVER running total",sql:`WITH monthly AS(
- SELECT DATE_FORMAT(payment_date,'%Y-%m') month,COUNT(*) payouts,SUM(amount) paid
+ GROUP BY r.researcher_id,r.name,r.country,py.currency)
+SELECT RANK() OVER(PARTITION BY currency ORDER BY earned DESC) earnings_rank,
+ DENSE_RANK() OVER(ORDER BY accepted DESC) accepted_rank,
+ name,country,currency,earned,accepted FROM earnings ORDER BY currency,earnings_rank,name`},
+{id:"Q09",title:"Monthly completed payouts and running total per currency",technique:"CTE + SUM() OVER running total",sql:`WITH monthly AS(
+ SELECT currency,DATE_FORMAT(payment_date,'%Y-%m') month,COUNT(*) payouts,SUM(amount) paid
  FROM PAYOUT WHERE payment_status='COMPLETED'
- GROUP BY DATE_FORMAT(payment_date,'%Y-%m'))
-SELECT month,payouts,paid,SUM(paid) OVER(ORDER BY month) running_total FROM monthly ORDER BY month`},
+ GROUP BY currency,DATE_FORMAT(payment_date,'%Y-%m'))
+SELECT currency,month,payouts,paid,
+ SUM(paid) OVER(PARTITION BY currency ORDER BY month) running_total
+FROM monthly ORDER BY currency,month`},
 {id:"Q10",title:"Acceptance rate per researcher (at least two reports)",technique:"Conditional aggregates + HAVING",sql:`SELECT r.name,COUNT(*) reports,SUM(v.status='ACCEPTED') accepted,
  SUM(v.status='DUPLICATE') duplicates,SUM(v.status='REJECTED') rejected,
  ROUND(100*SUM(v.status='ACCEPTED')/COUNT(*),1) acceptance_pct
