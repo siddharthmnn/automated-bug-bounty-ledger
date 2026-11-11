@@ -7,20 +7,21 @@ import type { companySchema } from "@/server/validation/schemas";
 type CompanyInput=z.infer<typeof companySchema>;
 export interface CompanyRow {
  company_id:number;name:string;industry:string|null;website:string|null;
- programs:number;active_programs:number;total_paid:number;
+ programs:number;active_programs:number;paid_by_currency:string|null;
 }
 export async function listCompanies():Promise<CompanyRow[]> {
  return select<CompanyRow>(getPool("admin"),`
  SELECT c.company_id,c.name,c.industry,c.website,
         COUNT(DISTINCT p.program_id) programs,
         COUNT(DISTINCT CASE WHEN p.status='ACTIVE' THEN p.program_id END) active_programs,
-        COALESCE(pay.total_paid,0) total_paid
+        GROUP_CONCAT(CONCAT(pay.currency,' ',CAST(pay.total_paid AS CHAR))
+          ORDER BY pay.currency SEPARATOR ' · ') paid_by_currency
  FROM COMPANY c
  LEFT JOIN PROGRAM p ON p.company_id=c.company_id
  LEFT JOIN (
-   SELECT v.program_id,SUM(py.amount) total_paid
+   SELECT v.program_id,py.currency,SUM(py.amount) total_paid
    FROM PAYOUT py JOIN VULNERABILITY v ON v.vuln_id=py.vuln_id
-   WHERE py.payment_status='COMPLETED' GROUP BY v.program_id
+   WHERE py.payment_status='COMPLETED' GROUP BY v.program_id,py.currency
  ) pay ON pay.program_id=p.program_id
  GROUP BY c.company_id,c.name,c.industry,c.website ORDER BY c.name`);
 }
