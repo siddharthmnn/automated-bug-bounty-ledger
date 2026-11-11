@@ -1,0 +1,4 @@
+import { ok,route } from "@/server/http";
+import { requireApiUser } from "@/server/auth/guard";
+import { listMyPayouts } from "@/server/services/ledger";
+export const GET=route(async()=>ok(await listMyPayouts(await requireApiUser("RESEARCHER"))));
