@@ -118,7 +118,7 @@ expect_forbidden /api/me/reports "$ADMIN_JAR"
 json_request POST "/api/vulnerabilities/$VULN_ID/review" "$ADMIN_JAR" \
   '{"decision":"ACCEPTED","note":"CI authenticated E2E acceptance"}' "$TMP_DIR/review.json"
 json_request POST /api/patches "$ADMIN_JAR" \
-  "$(jq -nc --argjson vulnId "$VULN_ID" '{vulnId:$vulnId,patchDate:"2026-11-12",notes:"CI verified patch"}')" "$TMP_DIR/patch.json"
+  "$(jq -nc --argjson vulnId "$VULN_ID" '{vulnId:$vulnId,patchDate:"2026-11-11",notes:"CI verified patch"}')" "$TMP_DIR/patch.json"
 PATCH_ID="$(jq -r '.data.patchId // empty' "$TMP_DIR/patch.json")"
 [[ -n "$PATCH_ID" ]] || { echo "Patch creation returned no patchId." >&2; cat "$TMP_DIR/patch.json" >&2; exit 1; }
 json_request POST "/api/patches/$PATCH_ID/verify" "$ADMIN_JAR" \
@@ -128,7 +128,7 @@ json_request POST /api/payouts "$ADMIN_JAR" \
 PAYOUT_ID="$(jq -r '.data.payoutId // empty' "$TMP_DIR/payout.json")"
 [[ -n "$PAYOUT_ID" ]] || { echo "Payout creation returned no payoutId." >&2; cat "$TMP_DIR/payout.json" >&2; exit 1; }
 json_request POST "/api/payouts/$PAYOUT_ID/complete" "$ADMIN_JAR" \
-  '{"result":"COMPLETED","paymentDate":"2026-11-12"}' "$TMP_DIR/complete.json"
+  '{"result":"COMPLETED","paymentDate":"2026-11-11"}' "$TMP_DIR/complete.json"
 
 # Assert persisted workflow state and researcher ownership via authenticated APIs.
 json_request GET /api/me/reports "$RESEARCHER_JAR" "" "$TMP_DIR/my-reports.json"
