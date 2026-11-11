@@ -162,7 +162,7 @@ describe("authentication route boundaries", () => {
   it("logout remains idempotent when the cookie is absent", async () => {
     mocks.cookies.mockResolvedValueOnce({ get: vi.fn().mockReturnValue(undefined) });
 
-    const response = await logout(new Request("http://localhost/api/auth/logout", { method: "POST" }));
+    const response = await logout(new Request("http://localhost/api/auth/logout", { method: "POST" }), {});
 
     expect(response.status).toBe(200);
     expect(mocks.execute).not.toHaveBeenCalled();
@@ -183,7 +183,7 @@ describe("authentication route boundaries", () => {
       new AppError(401, "UNAUTHENTICATED", "Please log in"),
     );
 
-    const response = await currentUser(new Request("http://localhost/api/auth/me"));
+    const response = await currentUser(new Request("http://localhost/api/auth/me"), {});
 
     expect(response.status).toBe(401);
     expect(await response.json()).toEqual({
