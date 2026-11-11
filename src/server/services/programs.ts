@@ -6,11 +6,12 @@ import { AppError } from "@/server/errors";
 import type { programSchema,programUpdateSchema } from "@/server/validation/schemas";
 export interface ProgramStatsRow {
  program_id:number;program_name:string;status:string;company_id:number;company_name:string;
- total_reports:number;submitted:number;triaged:number;accepted:number;rejected:number;duplicates:number;critical_reports:number;total_paid:number;
+ total_reports:number;submitted:number;triaged:number;accepted:number;rejected:number;duplicates:number;critical_reports:number;
+ currency:string|null;total_paid:number;
 }
 export async function listProgramsAdmin(companyId?:number):Promise<ProgramStatsRow[]> {
  return select<ProgramStatsRow>(getPool("admin"),
-  `SELECT * FROM v_program_stats ${companyId?"WHERE company_id = ?":""} ORDER BY company_name,program_name`,
+  `SELECT * FROM v_program_stats ${companyId?"WHERE company_id = ?":""} ORDER BY company_name,program_name,currency`,
   companyId?[companyId]:[]);
 }
 export async function getProgramAdmin(id:number) {
@@ -18,7 +19,7 @@ export async function getProgramAdmin(id:number) {
   getPool("admin"),`SELECT p.program_id,p.name,p.scope,p.status,p.company_id,c.name company_name
    FROM PROGRAM p JOIN COMPANY c ON c.company_id=p.company_id WHERE p.program_id=?`,[id]);
  if(!p)throw new AppError(404,"NOT_FOUND","Program not found");
- const stats=await selectOne<ProgramStatsRow>(getPool("admin"),"SELECT * FROM v_program_stats WHERE program_id=?",[id]);
+ const stats=await select<ProgramStatsRow>(getPool("admin"),"SELECT * FROM v_program_stats WHERE program_id=? ORDER BY currency",[id]);
  return {program:p,stats};
 }
 export async function createProgram(input:z.infer<typeof programSchema>) {
