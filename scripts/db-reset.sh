@@ -36,7 +36,7 @@ if [[ "$ready" -ne 1 ]]; then
 fi
 ready=0
 for _ in $(seq 1 30); do
-  if mysql_root -e "DROP DATABASE IF EXISTS `$DB`; CREATE DATABASE `$DB` CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci"; then
+  if mysql_root -e "DROP DATABASE IF EXISTS \`$DB\`; CREATE DATABASE \`$DB\` CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci"; then
     ready=1
     break
   fi
