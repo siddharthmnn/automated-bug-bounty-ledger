@@ -25,7 +25,7 @@ export const envSchema = z.object({
     ctx.addIssue({ code: "custom", path: ["DB_AUTH_PASSWORD"], message: "application database passwords must be distinct" });
   }
 });
-export type Env = z.infer<typeof schema>;
+export type Env = z.infer<typeof envSchema>;
 let cached: Env | null = null;
 
 export function env(): Env {
