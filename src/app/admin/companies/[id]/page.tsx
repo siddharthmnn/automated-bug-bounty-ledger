@@ -19,7 +19,7 @@ export default async function CompanyDetail({params}:{params:Promise<{id:string}
    <tbody>{programs.map(p=><tr key={p.program_id+"-"+(p.currency??"none")}><td><Link className="link" href={"/admin/programs/"+p.program_id}>{p.program_name}</Link></td>
     <td><StatusBadge value={p.status}/></td><td className="text-right tabular-nums">{p.total_reports}</td><td className="text-right tabular-nums">{p.accepted}</td>
     <td className="tabular-nums">{p.currency?p.currency+" "+Number(p.total_paid).toFixed(2):"—"}</td></tr>)}
-  </table></div>
+   </tbody></table></div>
   <div className="card"><div className="card-title">Danger zone</div>
    <p className="mb-3 text-sm text-muted">Deleting cascades to programs and their SUBMITTED reports. The database trigger blocks deletion once any report has been reviewed; close programs instead.</p>
    <DeleteButton url={"/api/companies/"+company.company_id} label="Delete company" redirectTo="/admin/companies"/>
