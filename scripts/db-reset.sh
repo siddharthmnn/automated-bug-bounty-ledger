@@ -25,7 +25,15 @@ mysql_root() {
 }
 
 echo "WARNING: this permanently drops and rebuilds the local database '$DB'."
-mysql_root -e "SELECT 1" >/dev/null
+ready=0
+for _ in $(seq 1 60); do
+  if mysql_root -e "SELECT 1" >/dev/null 2>&1; then ready=1; break; fi
+  sleep 2
+done
+if [[ "$ready" -ne 1 ]]; then
+  echo "ERROR: MySQL did not become ready within 120 seconds." >&2
+  exit 1
+fi
 mysql_root -e "DROP DATABASE IF EXISTS \`$DB\`; CREATE DATABASE \`$DB\` CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci"
 
 bash scripts/db-migrate.sh "$DB"
