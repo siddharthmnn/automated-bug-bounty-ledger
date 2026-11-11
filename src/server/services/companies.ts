@@ -14,7 +14,7 @@ export async function listCompanies():Promise<CompanyRow[]> {
  SELECT c.company_id,c.name,c.industry,c.website,
         COUNT(DISTINCT p.program_id) programs,
         COUNT(DISTINCT CASE WHEN p.status='ACTIVE' THEN p.program_id END) active_programs,
-        GROUP_CONCAT(CONCAT(pay.currency,' ',CAST(pay.total_paid AS CHAR))
+        GROUP_CONCAT(DISTINCT CONCAT(pay.currency,' ',CAST(pay.total_paid AS CHAR))
           ORDER BY pay.currency SEPARATOR ' · ') paid_by_currency
  FROM COMPANY c
  LEFT JOIN PROGRAM p ON p.company_id=c.company_id
