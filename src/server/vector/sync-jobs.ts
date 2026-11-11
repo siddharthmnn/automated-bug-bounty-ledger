@@ -3,7 +3,7 @@ import type { Pool } from "mysql2/promise";
 import { getPool } from "@/server/db/pools";
 import { execute,select } from "@/server/db/query";
 import { env } from "@/server/env";
-import { collectionName } from "@/server/vector/qdrant";
+import { collectionName,type ReportPayload } from "@/server/vector/qdrant";
 import { listAllPoints } from "@/server/vector/qdrant-paging";
 import { buildEmbeddingText,textHash } from "@/server/vector/text";
 import { syncReport,type SyncDeps,type SyncOutcome } from "@/server/vector/sync-core";
@@ -42,15 +42,25 @@ export async function enqueueAllReports(db:Pool=getPool("vector")):Promise<numbe
  const r=await execute(db,"INSERT INTO VECTOR_SYNC_JOB(vuln_id,operation) SELECT vuln_id,'UPSERT' FROM VULNERABILITY");
  return r.affectedRows;
 }
+function payloadMatches(actual:Partial<ReportPayload>|undefined,expected:ReportPayload):boolean {
+ if(!actual)return false;
+ const fields:(keyof ReportPayload)[]=["vuln_id","company_id","program_id","researcher_id","severity","status","submitted_date","text_sha256","model_name"];
+ return fields.every((key)=>String(actual[key]??"")===String(expected[key]??""));
+}
 export async function reconcile(deps?:Partial<SyncDeps>) {
  const db=deps?.db??getPool("vector"),collection=deps?.collection??collectionName();
- const rows=await select<{vuln_id:number;title:string;description:string|null}>(db,"SELECT vuln_id,title,description FROM VULNERABILITY");
+ const rows=await select<{vuln_id:number;title:string;description:string|null;severity:string;status:string;submitted_date:string;program_id:number;researcher_id:number;company_id:number}>(
+  db,`SELECT v.vuln_id,v.title,v.description,v.severity,v.status,v.submitted_date,
+   v.program_id,v.researcher_id,p.company_id
+   FROM VULNERABILITY v JOIN PROGRAM p ON p.program_id=v.program_id`);
  const points=await listAllPoints(collection),expectedModel=env().EMBEDDING_MODEL;
  const mysqlIds=new Set<number>(),upserts:number[]=[];
  for(const row of rows){
   mysqlIds.add(row.vuln_id);
-  const expected=`${textHash(buildEmbeddingText(row.title,row.description))}:${expectedModel}`;
-  if(points.get(row.vuln_id)!==expected)upserts.push(row.vuln_id);
+  const expected:ReportPayload={vuln_id:row.vuln_id,company_id:row.company_id,program_id:row.program_id,
+   researcher_id:row.researcher_id,severity:row.severity,status:row.status,submitted_date:String(row.submitted_date),
+   text_sha256:textHash(buildEmbeddingText(row.title,row.description)),model_name:expectedModel};
+  if(!payloadMatches(points.get(row.vuln_id),expected))upserts.push(row.vuln_id);
  }
  const deletes=[...points.keys()].filter(id=>!mysqlIds.has(id));
  for(const id of upserts)await execute(db,"INSERT INTO VECTOR_SYNC_JOB(vuln_id,operation) VALUES(?,'UPSERT')",[id]);
