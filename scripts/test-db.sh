@@ -20,4 +20,4 @@ echo "Initializing isolated Qdrant test collection."
 QDRANT_COLLECTION="vulnerability_reports_test" npx tsx scripts/qdrant-init.ts
 
 echo "Running integration tests against isolated test resources."
-MYSQL_DATABASE="$MYSQL_TEST_DATABASE" QDRANT_COLLECTION="vulnerability_reports_test" npx vitest run tests/integration
+MYSQL_DATABASE="$MYSQL_TEST_DATABASE" QDRANT_COLLECTION="vulnerability_reports_test" npx vitest run tests/integration tests/db
