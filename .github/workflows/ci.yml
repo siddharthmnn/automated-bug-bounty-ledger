@@ -52,5 +52,15 @@ jobs:
           sed -i "s/^DB_VECTOR_PASSWORD=.*/DB_VECTOR_PASSWORD=$(printf '%064d' 3)/" .env
       - run: docker compose up -d
       - run: npm run test:db
+      - name: Build production app against isolated test DB
+        run: |
+          set -a
+          source .env
+          set +a
+          export MYSQL_DATABASE="$MYSQL_TEST_DATABASE"
+          export QDRANT_COLLECTION=vulnerability_reports_test
+          npm run build
+      - name: Smoke-test production HTTP routes and auth guards
+        run: bash scripts/smoke-http.sh
       - if: always()
         run: docker compose down -v
