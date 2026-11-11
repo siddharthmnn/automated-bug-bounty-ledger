@@ -1,6 +1,5 @@
 # Local development databases for the Bug Bounty Ledger.
-# MySQL is published on host port 3307 so it does not clash with a MySQL
-# server you may already run on 3306 for MySQL Workbench.
+# Bind published ports to loopback: Qdrant has no auth by default.
 services:
   mysql:
     image: mysql:8.4
@@ -9,12 +8,10 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?set MYSQL_ROOT_PASSWORD in .env}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-bug_bounty_ledger}
-    # lower_case_table_names=1 makes table names case-insensitive, matching
-    # how MySQL behaved on Windows in Phase 1 (COMPANY == company).
-    # It can only be set when the data directory is first created.
+    # Set only on a fresh data directory; matches Phase 1's Windows behavior.
     command: ["--lower-case-table-names=1", "--character-set-server=utf8mb4", "--collation-server=utf8mb4_0900_ai_ci"]
     ports:
-      - "${MYSQL_PORT:-3307}:3306"
+      - "127.0.0.1:${MYSQL_PORT:-3307}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
@@ -28,8 +25,8 @@ services:
     container_name: abbl-qdrant
     restart: unless-stopped
     ports:
-      - "6333:6333" # REST API and web dashboard (http://localhost:6333/dashboard)
-      - "6334:6334" # gRPC
+      - "127.0.0.1:6333:6333" # REST API and dashboard
+      - "127.0.0.1:6334:6334" # gRPC
     volumes:
       - qdrant_data:/qdrant/storage
 
