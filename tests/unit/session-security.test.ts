@@ -114,31 +114,21 @@ describe("session persistence and validation", () => {
   });
 
   it("sets secure, HttpOnly, SameSite=Lax cookie attributes in production", () => {
-    const previous = process.env.NODE_ENV;
-    process.env.NODE_ENV = "production";
-    try {
-      const options = sessionCookieOptions(new Date("2026-12-01T00:00:00Z"));
-      expect(options).toMatchObject({
-        httpOnly: true,
-        secure: true,
-        sameSite: "lax",
-        path: "/",
-      });
-    } finally {
-      if (previous === undefined) delete process.env.NODE_ENV;
-      else process.env.NODE_ENV = previous;
-    }
+    vi.stubEnv("NODE_ENV", "production");
+    const options = sessionCookieOptions(new Date("2026-12-01T00:00:00Z"));
+    expect(options).toMatchObject({
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+    });
+    vi.unstubAllEnvs();
   });
 
   it("does not mark cookies secure in local development", () => {
-    const previous = process.env.NODE_ENV;
-    process.env.NODE_ENV = "development";
-    try {
-      expect(sessionCookieOptions(new Date()).secure).toBe(false);
-    } finally {
-      if (previous === undefined) delete process.env.NODE_ENV;
-      else process.env.NODE_ENV = previous;
-    }
+    vi.stubEnv("NODE_ENV", "development");
+    expect(sessionCookieOptions(new Date()).secure).toBe(false);
+    vi.unstubAllEnvs();
   });
 });
 
@@ -159,7 +149,7 @@ describe("authentication route boundaries", () => {
   });
 
   it("logout revokes the server-side session and clears the browser cookie", async () => {
-    const response = await logout(new Request("http://localhost/api/auth/logout", { method: "POST" }));
+    const response = await logout(new Request("http://localhost/api/auth/logout", { method: "POST" }), {});
 
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ data: { loggedOut: true } });
@@ -179,7 +169,7 @@ describe("authentication route boundaries", () => {
   });
 
   it("returns the authenticated identity from /api/auth/me", async () => {
-    const response = await currentUser(new Request("http://localhost/api/auth/me"));
+    const response = await currentUser(new Request("http://localhost/api/auth/me"), {});
 
     expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({
