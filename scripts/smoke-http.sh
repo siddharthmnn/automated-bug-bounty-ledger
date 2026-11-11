@@ -126,9 +126,9 @@ check_page /researcher/submit "$RESEARCHER_JAR" "Submit a report"
 check_page /researcher/programs "$RESEARCHER_JAR" "Programs"
 check_page /admin "$ADMIN_JAR" "Security operations"
 check_page /admin/reports "$ADMIN_JAR" "Reports"
-check_page /admin/analytics "$ADMIN_JAR" "Analytics"
-check_page /admin/patches "$ADMIN_JAR" "Patch"
-check_page /admin/payouts "$ADMIN_JAR" "Payout"
+check_page /admin/analytics "$ADMIN_JAR" "SQL analytics"
+check_page /admin/patches "$ADMIN_JAR" "Patches"
+check_page /admin/payouts "$ADMIN_JAR" "Payouts"
 check_role_redirect /admin "$RESEARCHER_JAR" /researcher
 check_role_redirect /researcher "$ADMIN_JAR" /admin
 
