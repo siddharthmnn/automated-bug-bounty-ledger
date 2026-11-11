@@ -15,11 +15,19 @@ FROM PROGRAM p JOIN COMPANY c ON c.company_id=p.company_id
 JOIN VULNERABILITY v ON v.program_id=p.program_id
 WHERE v.severity IN('HIGH','CRITICAL') GROUP BY p.program_id,p.name,c.name
 HAVING COUNT(*)>=2 ORDER BY high_or_critical DESC,worst_cvss DESC`},
-{id:"Q04",title:"Researchers earning above their own country average",technique:"Correlated subquery + stored function",sql:`SELECT r.researcher_id,r.name,r.country,fn_researcher_earnings(r.researcher_id) earned
-FROM RESEARCHER r
-WHERE fn_researcher_earnings(r.researcher_id)>(
- SELECT AVG(fn_researcher_earnings(r2.researcher_id)) FROM RESEARCHER r2 WHERE r2.country=r.country)
-ORDER BY earned DESC`},
+{id:"Q04",title:"Researcher earnings compared within each currency",technique:"CTE + correlated subquery + currency-safe aggregation",sql:`WITH researcher_currency AS (
+ SELECT r.researcher_id,r.name,r.country,py.currency,
+ SUM(CASE WHEN py.payment_status='COMPLETED' THEN py.amount ELSE 0 END) earned
+ FROM RESEARCHER r JOIN VULNERABILITY v ON v.researcher_id=r.researcher_id
+ JOIN PAYOUT py ON py.vuln_id=v.vuln_id
+ GROUP BY r.researcher_id,r.name,r.country,py.currency
+)
+SELECT rc.researcher_id,rc.name,rc.country,rc.currency,rc.earned
+FROM researcher_currency rc
+WHERE rc.earned > (
+ SELECT AVG(peer.earned) FROM researcher_currency peer
+ WHERE peer.country=rc.country AND peer.currency=rc.currency
+) ORDER BY rc.currency,rc.earned DESC`},
 {id:"Q05",title:"Reports whose CVSS is above their program average",technique:"Correlated subquery",sql:`SELECT v.vuln_id,v.title,v.cvss_score,p.name program,
  (SELECT ROUND(AVG(v2.cvss_score),2) FROM VULNERABILITY v2 WHERE v2.program_id=v.program_id) program_avg
 FROM VULNERABILITY v JOIN PROGRAM p ON p.program_id=v.program_id
