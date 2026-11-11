@@ -1,0 +1,41 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches: [main, feat/phase2-integration]
+permissions:
+  contents: read
+jobs:
+  quality:
+    name: Lint, typecheck, unit tests and production build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+        env:
+          MYSQL_HOST: 127.0.0.1
+          MYSQL_PORT: 3307
+          MYSQL_DATABASE: bug_bounty_ledger
+          MYSQL_ROOT_PASSWORD: ci-root-password
+          DB_AUTH_USER: app_auth
+          DB_AUTH_PASSWORD: 0123456789abcdef0123456789abcdef
+          DB_ADMIN_USER: app_admin
+          DB_ADMIN_PASSWORD: 1123456789abcdef0123456789abcdef
+          DB_RESEARCHER_USER: app_researcher
+          DB_RESEARCHER_PASSWORD: 2123456789abcdef0123456789abcdef
+          DB_VECTOR_USER: app_vector
+          DB_VECTOR_PASSWORD: 3123456789abcdef0123456789abcdef
+          QDRANT_URL: http://127.0.0.1:6333
+          QDRANT_COLLECTION: vulnerability_reports
+          EMBEDDING_MODEL: Xenova/all-MiniLM-L6-v2
+          EMBEDDING_DIM: 384
+          SIMILARITY_THRESHOLD: 0.70
+          SESSION_TTL_HOURS: 8
