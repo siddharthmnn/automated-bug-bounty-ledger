@@ -25,3 +25,23 @@ export async function researcherDirectory() {
  FROM RESEARCHER r LEFT JOIN v_leaderboard_public l ON l.researcher_id=r.researcher_id
  ORDER BY l.currency,l.earnings_rank,r.name`);
 }
+export async function adminDashboard() {
+ const db=getPool("admin");
+ const [counts,byStatus,bySeverity,payouts,recent]=await Promise.all([
+  select<Row>(db,`SELECT (SELECT COUNT(*) FROM COMPANY) companies,
+   (SELECT COUNT(*) FROM PROGRAM WHERE status='ACTIVE') active_programs,
+   (SELECT COUNT(*) FROM VULNERABILITY) reports,
+   (SELECT COUNT(*) FROM VULNERABILITY WHERE status='SUBMITTED') submitted,
+   (SELECT COUNT(*) FROM VULNERABILITY WHERE status='TRIAGED') triaged,
+   (SELECT COUNT(*) FROM VULNERABILITY WHERE status='ACCEPTED') accepted,
+   (SELECT COUNT(*) FROM PATCH WHERE verification_status='VERIFIED') verified_patches,
+   (SELECT COUNT(*) FROM PAYOUT WHERE payment_status='PENDING') pending_payouts`),
+  select<Row>(db,"SELECT status,COUNT(*) total FROM VULNERABILITY GROUP BY status ORDER BY status"),
+  select<Row>(db,"SELECT severity,COUNT(*) total FROM VULNERABILITY GROUP BY severity ORDER BY FIELD(severity,'CRITICAL','HIGH','MEDIUM','LOW')"),
+  select<Row>(db,"SELECT currency,COUNT(*) payouts,SUM(CASE WHEN payment_status='COMPLETED' THEN amount ELSE 0 END) completed_total FROM PAYOUT GROUP BY currency ORDER BY currency"),
+  select<Row>(db,`SELECT v.vuln_id,v.title,v.severity,v.status,v.submitted_date,r.name researcher_name
+   FROM VULNERABILITY v JOIN RESEARCHER r ON r.researcher_id=v.researcher_id
+   ORDER BY v.submitted_date DESC,v.vuln_id DESC LIMIT 8`)
+ ]);
+ return {counts:counts[0]??{},byStatus,bySeverity,payouts,recent};
+}
