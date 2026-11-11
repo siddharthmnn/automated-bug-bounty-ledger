@@ -1,0 +1,31 @@
+-- Synthetic vulnerability reports (invented test data).
+INSERT INTO VULNERABILITY
+  (vuln_id, title, description, severity, cvss_score, status, duplicate_of_vuln_id, submitted_date, program_id, researcher_id)
+VALUES
+  (327, 'Partner API returns full customer records without field filtering',
+   'The partner orders endpoint returns complete customer objects including phone numbers and home addresses that partners do not need.',
+   'HIGH', 8.2, 'ACCEPTED', NULL, '2026-07-07', 106, 206),
+  (328, 'Excessive data exposure in partner orders endpoint',
+   'Order responses for partners include unnecessary personal fields of shoppers such as full address and contact number.',
+   'HIGH', 7.9, 'SUBMITTED', NULL, '2026-10-12', 106, 208),
+  (329, 'GraphQL introspection enabled in production',
+   'The production GraphQL endpoint answers introspection queries and lists the full schema.',
+   'LOW', 2.7, 'REJECTED', NULL, '2026-04-22', 106, 214),
+  (330, 'JWT accepted with the none algorithm',
+   'The partner API accepts tokens whose header declares no signature algorithm, so an unsigned token is treated as valid.',
+   'CRITICAL', 9.8, 'ACCEPTED', NULL, '2026-01-28', 106, 207),
+  (331, 'Ride history of other users retrievable via trip ID',
+   'The trip details endpoint returns pickup and drop-off locations for any trip id, not only the rider''s own trips.',
+   'HIGH', 7.7, 'ACCEPTED', NULL, '2026-05-05', 107, 205),
+  (332, 'Driver location continues to be shared after the trip ends',
+   'The rider app keeps receiving the live driver location for several minutes after the trip has been completed.',
+   'MEDIUM', 6.5, 'ACCEPTED', NULL, '2026-06-30', 107, 211),
+  (333, 'Promo credits can be farmed by creating many referral accounts',
+   'There is no limit or verification on referral sign-ups, so one person can collect referral credit repeatedly.',
+   'MEDIUM', 5.3, 'TRIAGED', NULL, '2026-09-09', 107, 203),
+  (334, 'Trip receipts of other riders accessible by enumerating trip numbers',
+   'Incrementing the trip number in the receipt request returns receipts with routes and times of other riders.',
+   'HIGH', 7.5, 'DUPLICATE', 331, '2026-05-11', 107, 215),
+  (335, 'Private posts visible through the public RSS feed',
+   'Posts marked as private still appear in the user''s public RSS feed.',
+   'HIGH', 7.5, 'ACCEPTED', NULL, '2026-04-18', 108, 213);

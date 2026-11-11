@@ -1,0 +1,31 @@
+-- Synthetic vulnerability reports (invented test data).
+INSERT INTO VULNERABILITY
+  (vuln_id, title, description, severity, cvss_score, status, duplicate_of_vuln_id, submitted_date, program_id, researcher_id)
+VALUES
+  (336, 'CSRF on the email change form',
+   'The change-email form has no anti-CSRF token, so a malicious page can change a logged-in user''s email address.',
+   'HIGH', 8.0, 'ACCEPTED', NULL, '2026-08-08', 108, 209),
+  (337, 'Attacker page can change victim email address without any token',
+   'A third-party website can submit the account email update for a signed-in visitor because the request is not protected against cross-site forgery.',
+   'HIGH', 8.0, 'SUBMITTED', NULL, '2026-10-28', 108, 204),
+  (338, 'User enumeration through signup error messages',
+   'The signup form says whether an email is already registered.',
+   'LOW', 3.7, 'REJECTED', NULL, '2026-02-03', 108, 210),
+  (339, 'Image upload accepts SVG files with embedded scripts',
+   'Profile image upload accepts SVG files, and scripts inside them run when the image is opened directly.',
+   'MEDIUM', 6.4, 'TRIAGED', NULL, '2026-09-21', 108, 206),
+  (340, 'Console session not invalidated after password change',
+   'Other active console sessions stay logged in after the account password is changed.',
+   'MEDIUM', 5.9, 'ACCEPTED', NULL, '2026-07-22', 110, 212),
+  (341, 'Audit log export missing entries for deleted resources',
+   'The audit log export omits events for resources that were later deleted.',
+   'LOW', 2.5, 'SUBMITTED', NULL, '2026-11-02', 110, 207),
+  (342, 'Billing role can create new API keys',
+   'A user with only the billing role can create API keys with full project access.',
+   'HIGH', 8.1, 'ACCEPTED', NULL, '2026-10-05', 110, 203),
+  (343, 'Mobile app stores the auth token in plain-text preferences',
+   'The Android app saves the long-lived session token in unencrypted shared preferences.',
+   'HIGH', 7.1, 'ACCEPTED', NULL, '2026-02-17', 104, 206),
+  (344, 'Legacy messaging allows reading threads by thread ID',
+   'Message threads can be opened by any logged-in user who knows or guesses the thread id.',
+   'HIGH', 7.8, 'ACCEPTED', NULL, '2026-01-08', 109, 205);

@@ -1,0 +1,16 @@
+INSERT INTO PATCH (patch_id, patch_date, verified_by, verification_status, verified_at, notes, vuln_id) VALUES
+  (403, '2026-02-20', 'Rahul Iyer', 'VERIFIED', '2026-02-24 10:00:00', 'Webhook targets restricted to public addresses after DNS resolution', 305),
+  (404, '2026-01-26', 'Sara Chen',  'VERIFIED', '2026-01-29 15:30:00', 'Balance update moved into a locked database transaction', 310),
+  (405, '2026-08-20', NULL,         'PENDING',  NULL,                  'Lockout after five failed PIN attempts', 312),
+  (406, '2026-03-18', 'Rahul Iyer', 'VERIFIED', '2026-03-21 11:00:00', 'Ownership check added to lab record lookup', 314),
+  (407, '2026-04-15', 'Sara Chen',  'VERIFIED', '2026-04-17 09:45:00', 'Reset tokens are single use and expire after 30 minutes', 316),
+  (408, '2026-05-28', 'Rahul Iyer', 'VERIFIED', '2026-05-30 14:10:00', 'Coupon usage stored per cart and checked on apply', 321),
+  (409, '2026-03-08', 'Sara Chen',  'FAILED',   '2026-03-10 16:00:00', 'First fix encoded only angle brackets; retest failed', 323),
+  (410, '2026-06-24', 'Rahul Iyer', 'VERIFIED', '2026-06-26 12:00:00', 'Prices are read from the catalogue on the server', 325),
+  (411, '2026-07-30', NULL,         'PENDING',  NULL,                  'Partner response trimmed to required fields', 327),
+  (412, '2026-02-04', 'Sara Chen',  'VERIFIED', '2026-02-06 10:20:00', 'Token verification now requires an allowed signing algorithm', 330),
+  (413, '2026-05-14', 'Rahul Iyer', 'VERIFIED', '2026-05-16 13:00:00', 'Trip lookup scoped to the requesting rider', 331),
+  (414, '2026-07-12', NULL,         'PENDING',  NULL,                  'Location stream closed when the trip ends', 332),
+  (415, '2026-04-29', 'Sara Chen',  'VERIFIED', '2026-05-02 09:00:00', 'Private posts filtered out of feeds', 335),
+  (416, '2026-08-25', NULL,         'PENDING',  NULL,                  'Anti-CSRF token added to account settings forms', 336),
+  (417, '2026-08-01', 'Rahul Iyer', 'VERIFIED', '2026-08-03 17:30:00', 'All sessions revoked on password change', 340);
