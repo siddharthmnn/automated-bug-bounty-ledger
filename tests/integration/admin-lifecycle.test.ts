@@ -32,7 +32,7 @@ describe("admin report, patch and payout lifecycle guards",()=>{
   it("rejects final decisions from an invalid starting state and permits the intended path",async()=>{
     const {vulnId,adminId}=await fixture();
     expect(await errnoOf(callProcedure(getPool("admin"),"sp_review_vulnerability",[
-      adminId,vulnId,"REJECTED",null,"must not skip triage",
+      adminId,vulnId,"SUBMITTED",null,"same-state review must be rejected",
     ]))).toBe(1644);
     await callProcedure(getPool("admin"),"sp_review_vulnerability",[
       adminId,vulnId,"TRIAGED",null,"initial triage",
