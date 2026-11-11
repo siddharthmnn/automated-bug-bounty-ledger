@@ -28,7 +28,7 @@ Analytics group earnings and payout totals by currency. Values denominated in di
 
 ~~~bash
 cp .env.example .env
-# Replace change-me values with strong local secrets.
+# Set MYSQL_ROOT_PASSWORD to a strong local password. Replace the four app-account passwords with distinct random 32+ character hexadecimal secrets (for example: openssl rand -hex 32).
 npm ci
 docker compose up -d
 npm run db:reset
