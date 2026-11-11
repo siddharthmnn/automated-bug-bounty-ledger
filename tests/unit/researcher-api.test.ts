@@ -79,8 +79,8 @@ describe("researcher API route contracts", () => {
   });
 
   it("scopes report and payout collections to the authenticated researcher", async () => {
-    const reports = await getMyReports(request("http://localhost/api/me/reports"));
-    const payouts = await getMyPayouts(request("http://localhost/api/me/payouts"));
+    const reports = await getMyReports(request("http://localhost/api/me/reports"), {});
+    const payouts = await getMyPayouts(request("http://localhost/api/me/payouts"), {});
 
     expect(reports.status).toBe(200);
     expect(payouts.status).toBe(200);
@@ -95,7 +95,7 @@ describe("researcher API route contracts", () => {
       new AppError(401, "UNAUTHENTICATED", "Please log in"),
     );
 
-    const response = await getMyReports(request("http://localhost/api/me/reports"));
+    const response = await getMyReports(request("http://localhost/api/me/reports"), {});
 
     expect(response.status).toBe(401);
     expect(await response.json()).toEqual({
@@ -111,6 +111,7 @@ describe("researcher API route contracts", () => {
         researcherId: 999,
         userId: 999,
       }),
+      {},
     );
 
     expect(response.status).toBe(201);
@@ -122,6 +123,7 @@ describe("researcher API route contracts", () => {
   it("returns a safe validation error for malformed report input", async () => {
     const response = await submitReport(
       request("http://localhost/api/vulnerabilities", "POST", { ...payload, cvssScore: 11 }),
+      {},
     );
 
     expect(response.status).toBe(400);
