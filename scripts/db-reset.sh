@@ -14,6 +14,10 @@ source .env
 set +a
 
 DB="${1:-${MYSQL_DATABASE:?MYSQL_DATABASE is not configured in .env}}"
+if [[ "${NODE_ENV:-}" == "production" ]]; then
+  echo "ERROR: refusing destructive database reset while NODE_ENV=production." >&2
+  exit 1
+fi
 case "$DB" in
   bug_bounty_ledger|bug_bounty_ledger_test) ;;
   *) echo "ERROR: refusing to drop unexpected database name: $DB" >&2; exit 1 ;;
@@ -24,7 +28,7 @@ mysql_root() {
     mysql -uroot --default-character-set=utf8mb4 "$@"
 }
 
-echo "WARNING: this permanently drops and rebuilds the local database '$DB'."
+echo "WARNING: target database is the allowlisted local database '$DB'."
 ready=0
 for _ in $(seq 1 60); do
   if mysql_root -e "SELECT 1" >/dev/null 2>&1; then ready=1; break; fi
