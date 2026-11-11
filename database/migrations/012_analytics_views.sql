@@ -1,7 +1,7 @@
 -- =====================================================================
 -- 012_analytics_views.sql
--- Public leaderboard contains no e-mail or account fields. The admin
--- overview takes the latest patch and payout per report to avoid fan-out.
+-- Earnings are ranked independently per currency. Amounts in different
+-- currencies are never added or compared as if they shared a unit.
 -- =====================================================================
 DROP VIEW IF EXISTS v_leaderboard_public;
 DROP VIEW IF EXISTS v_admin_report_overview;
@@ -14,15 +14,16 @@ WITH report_stats AS (
  FROM RESEARCHER r LEFT JOIN VULNERABILITY v ON v.researcher_id=r.researcher_id
  GROUP BY r.researcher_id,r.name,r.country,r.reputation_score
 ), payout_stats AS (
- SELECT v.researcher_id,COALESCE(SUM(CASE WHEN py.payment_status='COMPLETED' THEN py.amount ELSE 0 END),0) total_earned
- FROM VULNERABILITY v LEFT JOIN PAYOUT py ON py.vuln_id=v.vuln_id
- GROUP BY v.researcher_id
+ SELECT v.researcher_id,py.currency,
+ SUM(CASE WHEN py.payment_status='COMPLETED' THEN py.amount ELSE 0 END) total_earned
+ FROM VULNERABILITY v JOIN PAYOUT py ON py.vuln_id=v.vuln_id
+ GROUP BY v.researcher_id,py.currency
 ), ranked AS (
- SELECT rs.*,COALESCE(ps.total_earned,0) total_earned
+ SELECT rs.*,ps.currency,COALESCE(ps.total_earned,0) total_earned
  FROM report_stats rs LEFT JOIN payout_stats ps ON ps.researcher_id=rs.researcher_id
 )
-SELECT RANK() OVER(ORDER BY total_earned DESC,accepted_reports DESC) earnings_rank,
- researcher_id,name,country,reputation_score,reports_submitted,accepted_reports,total_earned
+SELECT RANK() OVER(PARTITION BY currency ORDER BY total_earned DESC,accepted_reports DESC) earnings_rank,
+ researcher_id,name,country,reputation_score,reports_submitted,accepted_reports,currency,total_earned
 FROM ranked;
 
 CREATE VIEW v_admin_report_overview AS
