@@ -49,5 +49,7 @@ check_status 200 /register
 check_redirect /admin
 check_redirect /researcher
 check_status 401 /api/analytics/dashboard
-check_status 400 /api/auth/login
+login_status="$(curl -sS -X POST -H 'content-type: application/json' -d '{}' -o /tmp/abbl-smoke-body -w '%{http_code}' "$BASE/api/auth/login")"
+if [[ "$login_status" != "400" ]]; then echo "FAIL POST /api/auth/login: expected HTTP 400, got $login_status" >&2; cat /tmp/abbl-smoke-body >&2; exit 1; fi
+echo "PASS POST /api/auth/login -> HTTP 400 (schema validation)"
 echo "Production HTTP smoke tests passed."
