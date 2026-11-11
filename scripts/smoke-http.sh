@@ -53,12 +53,17 @@ check_redirect(){
   echo "PASS $path -> login redirect"
 }
 json_request(){
-  local method="$1" path="$2" jar="$3" body="${4:-}" output="$5"
+  local method="$1" path="$2" jar="$3" body="${4:-}" output="$5" status
   if [[ -n "$body" ]]; then
-    curl -fsS -X "$method" -H 'content-type: application/json' -b "$jar" -c "$jar" \
-      -d "$body" "$BASE$path" -o "$output"
+    status="$(curl -sS -X "$method" -H 'content-type: application/json' -b "$jar" -c "$jar" \
+      -d "$body" -o "$output" -w '%{http_code}' "$BASE$path")"
   else
-    curl -fsS -X "$method" -b "$jar" -c "$jar" "$BASE$path" -o "$output"
+    status="$(curl -sS -X "$method" -b "$jar" -c "$jar" -o "$output" -w '%{http_code}' "$BASE$path")"
+  fi
+  if [[ "$status" -lt 200 || "$status" -ge 300 ]]; then
+    echo "FAIL $method $path -> HTTP $status" >&2
+    cat "$output" >&2
+    exit 1
   fi
 }
 login(){
