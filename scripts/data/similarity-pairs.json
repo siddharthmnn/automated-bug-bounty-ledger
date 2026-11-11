@@ -1,0 +1,5 @@
+{
+  "note": "Labelled pairs from synthetic seed data. Positive pairs share an underlying bug; negative pairs are different bugs within the same company. Used only to evaluate the similarity threshold.",
+  "positive": [[304,301],[309,302],[315,314],[317,316],[318,316],[324,323],[334,331],[306,305],[311,310],[322,321],[328,327],[337,336]],
+  "negative": [[301,303],[305,307],[306,308],[310,312],[311,313],[314,316],[316,319],[320,315],[321,323],[322,325],[327,330],[328,329],[331,332],[333,334],[335,336],[337,338],[340,342],[326,325]]
+}

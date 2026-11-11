@@ -23,7 +23,7 @@
     "vector:reconcile": "tsx scripts/vector-reconcile.ts",
     "vector:eval": "tsx scripts/threshold-eval.ts",
     "test": "vitest run tests/unit",
-    "test:db": "vitest run tests/db tests/integration",
+    "test:db": "bash scripts/test-db.sh",
     "test:all": "vitest run"
   },
   "dependencies": {
