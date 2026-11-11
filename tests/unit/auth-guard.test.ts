@@ -1,6 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AppError } from "@/server/errors";
-
 const mocks = vi.hoisted(() => ({
   getCurrentUser: vi.fn(),
   redirect: vi.fn((path: string): never => {
