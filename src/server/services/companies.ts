@@ -19,10 +19,11 @@ export async function listCompanies():Promise<CompanyRow[]> {
  FROM COMPANY c
  LEFT JOIN PROGRAM p ON p.company_id=c.company_id
  LEFT JOIN (
-   SELECT v.program_id,py.currency,SUM(py.amount) total_paid
+   SELECT pr.company_id,py.currency,SUM(py.amount) total_paid
    FROM PAYOUT py JOIN VULNERABILITY v ON v.vuln_id=py.vuln_id
-   WHERE py.payment_status='COMPLETED' GROUP BY v.program_id,py.currency
- ) pay ON pay.program_id=p.program_id
+   JOIN PROGRAM pr ON pr.program_id=v.program_id
+   WHERE py.payment_status='COMPLETED' GROUP BY pr.company_id,py.currency
+ ) pay ON pay.company_id=c.company_id
  GROUP BY c.company_id,c.name,c.industry,c.website ORDER BY c.name`);
 }
 export async function getCompany(id:number) {
