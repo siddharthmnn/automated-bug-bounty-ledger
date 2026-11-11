@@ -5,11 +5,11 @@ import { money } from "@/lib/format";
 export default async function ResearchersPage() {
  await requirePageUser("ADMIN");const rows=await researcherDirectory();
  return <>
-  <PageHeader title="Researchers" subtitle="Admin directory joins RESEARCHER with the public leaderboard; contact details stay behind the admin database account."/>
-  <div className="card overflow-x-auto p-0"><table className="table"><thead><tr><th>Researcher</th><th>E-mail</th><th>Country</th><th className="text-right">Reputation</th><th className="text-right">Reports</th><th className="text-right">Accepted</th><th className="text-right">Acceptance</th><th className="text-right">Earned</th></tr></thead>
-   <tbody>{rows.map((r,i)=><tr key={Number(r.researcher_id)}><td className="font-medium">{String(r.name)}</td><td className="text-muted">{String(r.email)}</td><td className="text-muted">{String(r.country??"-")}</td>
-    <td className="text-right tabular-nums">{String(r.reputation_score)}</td><td className="text-right tabular-nums">{String(r.reports_submitted)}</td><td className="text-right tabular-nums">{String(r.accepted_reports)}</td>
-    <td className="text-right tabular-nums">{r.acceptance_pct===null?"-":String(r.acceptance_pct)+"%"}</td><td className="text-right tabular-nums">{money(Number(r.total_earned))}</td></tr>)}</tbody>
+  <PageHeader title="Researchers" subtitle="Admin directory joins RESEARCHER with the public leaderboard; earnings are shown separately by currency."/>
+  <div className="card overflow-x-auto p-0"><table className="table"><thead><tr><th>Researcher</th><th>E-mail</th><th>Country</th><th>Reputation</th><th>Reports</th><th>Accepted</th><th>Acceptance</th><th>Currency</th><th>Earned</th></tr></thead>
+   <tbody>{rows.map(r=><tr key={String(r.researcher_id)+String(r.currency)}><td className="font-medium">{String(r.name)}</td><td className="text-muted">{String(r.email)}</td><td className="text-muted">{String(r.country??"-")}</td>
+    <td className="tabular-nums">{String(r.reputation_score)}</td><td className="tabular-nums">{String(r.reports_submitted??0)}</td><td className="tabular-nums">{String(r.accepted_reports??0)}</td>
+    <td className="tabular-nums">{r.acceptance_pct===null||r.acceptance_pct===undefined?"-":String(r.acceptance_pct)+"%"}</td><td>{String(r.currency??"-")}</td><td className="tabular-nums">{r.currency?money(Number(r.total_earned),String(r.currency)):"-"}</td></tr>)}</tbody>
   </table></div>
  </>;
 }
