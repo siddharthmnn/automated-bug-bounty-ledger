@@ -12,6 +12,6 @@ export default async function ResearcherPrograms() {
    <Link className="link mt-1 text-lg font-semibold" href={`/researcher/programs/${p.program_id}`}>{p.program_name}</Link>
    <p className="mt-2 line-clamp-3 flex-1 text-sm text-muted">{p.scope??"No scope published."}</p>
    <div className="mt-4 flex items-center justify-between text-sm"><span className="text-muted">{p.accepted_reports} accepted report(s)</span><Link className="btn btn-sm btn-primary" href={`/researcher/submit?program=${p.program_id}`}>Report</Link></div>
-  </div>)}</div>
+  </div>)}</div>}
  </>;
 }
