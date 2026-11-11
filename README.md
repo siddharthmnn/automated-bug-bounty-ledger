@@ -61,6 +61,8 @@ The local MySQL port is 3307; Qdrant REST/gRPC ports are 6333/6334. Services are
 ## Documentation
 
 - docs/phase2-architecture.md — architecture, design decisions and viva sequence
+- docs/er-diagram.md — Mermaid ER diagram and relationship cardinalities
+- docs/relational-schema.md — relational schema, keys and integrity constraints
 - database/migrations/ — ordered SQL migrations
 - src/server/vector/ — vector synchronization implementation
 - src/server/services/analytics-catalogue-a.ts — SQL analytics catalogue
