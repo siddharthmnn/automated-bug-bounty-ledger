@@ -43,6 +43,9 @@ describe("currency-safe analytics and dashboard read models",()=>{
   await callProcedure(getPool("admin"),"sp_review_vulnerability",[
    admins[0].user_id,vulnId,"ACCEPTED",null,"currency aggregation integration test"
   ]);
+  const beforeProgramTotals=await select<{currency:string;total_paid:number}>(getPool("admin"),
+   "SELECT currency,total_paid FROM v_program_stats WHERE program_id=? ORDER BY currency",[programs[0].program_id]);
+  const priorInr=beforeProgramTotals.find(x=>x.currency==="INR")?.total_paid??0;
   const [created]=await callProcedure(getPool("admin"),"sp_create_payout",[vulnId,125.5,"INR"]);
   const payoutId=Number(created?.[0]?.payout_id);expect(payoutId).toBeGreaterThan(0);
   await callProcedure(getPool("admin"),"sp_complete_payout",[payoutId,"COMPLETED","2026-11-12"]);
@@ -53,7 +56,7 @@ describe("currency-safe analytics and dashboard read models",()=>{
    "SELECT currency,total_paid FROM v_program_stats WHERE program_id=? ORDER BY currency",[programs[0].program_id]);
   expect(programTotals.map(x=>x.currency)).toContain("USD");
   expect(programTotals.map(x=>x.currency)).toContain("INR");
-  expect(programTotals.find(x=>x.currency==="INR")?.total_paid).toBe(125.5);
+  expect(programTotals.find(x=>x.currency==="INR")?.total_paid).toBe(priorInr+125.5);
   const company= (await listCompanies()).find(x=>x.company_id===programs[0].company_id);
   expect(company?.paid_by_currency).toContain("USD");
   expect(company?.paid_by_currency).toContain("INR");
