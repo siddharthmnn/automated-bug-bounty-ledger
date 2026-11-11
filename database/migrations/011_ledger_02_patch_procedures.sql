@@ -15,13 +15,16 @@ CREATE PROCEDURE sp_verify_patch(IN p_patch_id INT,IN p_result VARCHAR(10),IN p_
 SQL SECURITY DEFINER
 BEGIN
  DECLARE v_status VARCHAR(10);
+ DECLARE EXIT HANDLER FOR SQLEXCEPTION BEGIN ROLLBACK; RESIGNAL; END;
  IF p_result NOT IN('VERIFIED','FAILED')
  THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Verification result must be VERIFIED or FAILED'; END IF;
+ START TRANSACTION;
  SELECT verification_status INTO v_status FROM PATCH WHERE patch_id=p_patch_id FOR UPDATE;
  IF v_status IS NULL THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Patch not found';
  ELSEIF v_status='VERIFIED' THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Patch is already verified'; END IF;
  UPDATE PATCH SET verification_status=p_result,verified_by=p_verified_by,verified_at=NOW(),
  notes=COALESCE(NULLIF(TRIM(p_notes),''),notes) WHERE patch_id=p_patch_id;
+ COMMIT;
  SELECT p_patch_id AS patch_id,p_result AS verification_status;
 END$$
 DELIMITER ;
