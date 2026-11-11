@@ -17,15 +17,18 @@ BEGIN
   WHEN p_score>=4.0 THEN 'MEDIUM' ELSE 'LOW' END;
 END$$
 
--- Single-currency totals must be calculated per currency by the application;
--- this legacy convenience function is a raw numeric total, not FX-converted.
+-- The legacy single-number API is deliberately NULL for multi-currency
+-- researchers. Callers needing a breakdown must GROUP BY currency.
 CREATE FUNCTION fn_researcher_earnings(p_researcher_id INT)
 RETURNS DECIMAL(12,2) READS SQL DATA
 BEGIN
- DECLARE v_total DECIMAL(12,2);
- SELECT COALESCE(SUM(py.amount),0) INTO v_total
+ DECLARE v_currency_count INT DEFAULT 0;
+ DECLARE v_total DECIMAL(12,2) DEFAULT 0;
+ SELECT COUNT(DISTINCT py.currency),COALESCE(SUM(py.amount),0)
+ INTO v_currency_count,v_total
  FROM PAYOUT py JOIN VULNERABILITY v ON v.vuln_id=py.vuln_id
  WHERE v.researcher_id=p_researcher_id AND py.payment_status='COMPLETED';
+ IF v_currency_count>1 THEN RETURN NULL; END IF;
  RETURN v_total;
 END$$
 
