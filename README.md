@@ -77,3 +77,8 @@ Admin manages companies/programs and triages reports. Researchers submit and tra
 - Never commit .env, passwords, private vulnerability disclosures or real payout details.
 - Keep MySQL and Qdrant on trusted local/private networks.
 - This application manages disclosure workflow and ledger records; it does not autonomously patch external repositories.
+
+
+## Accessibility
+
+See [the accessibility and responsive UI audit](docs/accessibility-responsive-audit.md) for keyboard, form feedback and viewport checks.
