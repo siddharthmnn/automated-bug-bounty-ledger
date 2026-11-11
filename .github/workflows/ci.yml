@@ -2,7 +2,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main, feat/phase2-integration]
+    branches: [main]
 permissions:
   contents: read
 jobs:
