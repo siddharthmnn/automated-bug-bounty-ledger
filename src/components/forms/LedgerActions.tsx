@@ -8,8 +8,8 @@ export function RecordPatchForm({vulnId}:{vulnId:number}) {
   e.preventDefault();const values=formValues(e.currentTarget);
   await run(()=>api("POST","/api/patches",{...values,vulnId}),{success:"Patch recorded"});
  }}>
-  <input className="input w-36" type="date" name="patchDate" defaultValue={today()} max={today()} required/>
-  <input className="input w-56" name="notes" placeholder="Fix summary" maxLength={300}/>
+  <div><label className="label" htmlFor={`patch-date-${vulnId}`}>Patch date</label><input id={`patch-date-${vulnId}`} className="input w-36" type="date" name="patchDate" defaultValue={today()} max={today()} required/></div>
+  <div><label className="label" htmlFor={`patch-notes-${vulnId}`}>Fix summary</label><input id={`patch-notes-${vulnId}`} className="input w-56" name="notes" maxLength={300}/></div>
   <button className="btn btn-sm btn-primary" disabled={busy}>Record patch</button>
   <div className="w-full"><FormStatus error={error}/></div>
  </form>;
@@ -27,8 +27,8 @@ export function CreatePayoutForm({vulnId}:{vulnId:number}) {
   e.preventDefault();const values=formValues(e.currentTarget);
   await run(()=>api("POST","/api/payouts",{...values,vulnId}),{success:"Payout created"});
  }}>
-  <input className="input w-28" type="number" name="amount" min="0.01" step="0.01" placeholder="Amount" required/>
-  <select className="input w-24" name="currency" defaultValue="USD"><option>USD</option><option>EUR</option><option>INR</option></select>
+  <div><label className="label" htmlFor={`payout-amount-${vulnId}`}>Amount</label><input id={`payout-amount-${vulnId}`} className="input w-28" type="number" name="amount" min="0.01" step="0.01" placeholder="Amount" required/></div>
+  <div><label className="label" htmlFor={`payout-currency-${vulnId}`}>Currency</label><select id={`payout-currency-${vulnId}`} className="input w-24" name="currency" defaultValue="USD"><option>USD</option><option>EUR</option><option>INR</option></select></div>
   <button className="btn btn-sm btn-primary" disabled={busy}>Create payout</button>
   <div className="w-full"><FormStatus error={error}/></div>
  </form>;
