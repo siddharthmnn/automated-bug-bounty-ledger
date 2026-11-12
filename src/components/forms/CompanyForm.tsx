@@ -9,9 +9,9 @@ export function CompanyForm({company}:{company?:Company}) {
   if(company)await run(()=>api("PATCH",`/api/companies/${company.company_id}`,values),{success:"Saved"});
   else {const ok=await run(()=>api("POST","/api/companies",values),{success:"Company created"});if(ok)form.reset();}
  }}>
-  <div><label className="label">Name</label><input className="input" name="name" defaultValue={company?.name} required minLength={2} maxLength={100}/></div>
-  <div><label className="label">Industry</label><input className="input" name="industry" defaultValue={company?.industry??""} maxLength={50}/></div>
-  <div><label className="label">Website</label><input className="input" name="website" defaultValue={company?.website??""} maxLength={100}/></div>
+  <div><label className="label" htmlFor="company-name">Name</label><input id="company-name" className="input" name="name" defaultValue={company?.name} required minLength={2} maxLength={100}/></div>
+  <div><label className="label" htmlFor="company-industry">Industry</label><input id="company-industry" className="input" name="industry" defaultValue={company?.industry??""} maxLength={50}/></div>
+  <div><label className="label" htmlFor="company-website">Website</label><input id="company-website" className="input" name="website" defaultValue={company?.website??""} maxLength={100}/></div>
   <button className="btn btn-primary" disabled={busy}>{company?"Save":"Add company"}</button>
   <div className="sm:col-span-4"><FormStatus error={error} message={message}/></div>
  </form>;
