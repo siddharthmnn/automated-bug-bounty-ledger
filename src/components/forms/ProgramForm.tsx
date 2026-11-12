@@ -11,12 +11,12 @@ export function ProgramForm({program,companies,companyId}:{
   if(program)await run(()=>api("PATCH",`/api/programs/${program.program_id}`,values),{success:"Saved"});
   else {const ok=await run(()=>api("POST","/api/programs",values),{success:"Program created"});if(ok)form.reset();}
  }}>
-  {!program&&<div><label className="label">Company</label><select className="input" name="companyId" defaultValue={companyId} required>
+  {!program&&<div><label className="label" htmlFor="program-company">Company</label><select id="program-company" className="input" name="companyId" defaultValue={companyId} required>
    {companies?.map(c=><option key={c.company_id} value={c.company_id}>{c.name}</option>)}
   </select></div>}
-  <div><label className="label">Program name</label><input className="input" name="name" defaultValue={program?.name} required minLength={3} maxLength={100}/></div>
-  <div><label className="label">Scope</label><input className="input" name="scope" defaultValue={program?.scope??""} maxLength={200} placeholder="e.g. api.example.com/*"/></div>
-  <div><label className="label">Status</label><select className="input" name="status" defaultValue={program?.status??"ACTIVE"}><option>ACTIVE</option><option>PAUSED</option><option>CLOSED</option></select></div>
+  <div><label className="label" htmlFor="program-name">Program name</label><input id="program-name" className="input" name="name" defaultValue={program?.name} required minLength={3} maxLength={100}/></div>
+  <div><label className="label" htmlFor="program-scope">Scope</label><input id="program-scope" className="input" name="scope" defaultValue={program?.scope??""} maxLength={200} placeholder="e.g. api.example.com/*"/></div>
+  <div><label className="label" htmlFor="program-status">Status</label><select id="program-status" className="input" name="status" defaultValue={program?.status??"ACTIVE"}><option>ACTIVE</option><option>PAUSED</option><option>CLOSED</option></select></div>
   <div className="flex items-end"><button className="btn btn-primary" disabled={busy}>{program?"Save program":"Create program"}</button></div>
   <div className="sm:col-span-2"><FormStatus error={error} message={message}/></div>
  </form>;
