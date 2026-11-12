@@ -16,8 +16,8 @@ export function ReportForm({programs,defaultProgramId,report}:{
    {programs?.map(p=><option key={p.program_id} value={p.program_id}>{p.company_name} - {p.program_name}</option>)}
   </select></div>}
   <div><label className="label" htmlFor="report-title">Title</label><input id="report-title" className="input" name="title" defaultValue={report?.title} required minLength={5} maxLength={150}/></div>
-  <div><label className="label">Description (impact and high-level reproduction; no live exploit code)</label>
-   <textarea className="input min-h-40" name="description" defaultValue={report?.description??""} required minLength={20} maxLength={4000}/></div>
+  <div><label className="label" htmlFor="report-description">Description (impact and high-level reproduction; no live exploit code)</label>
+   <textarea id="report-description" className="input min-h-40" name="description" defaultValue={report?.description??""} required minLength={20} maxLength={4000}/></div>
   <div className="grid gap-4 sm:grid-cols-2">
    <div><label className="label" htmlFor="report-severity">Severity</label><select id="report-severity" className="input" name="severity" defaultValue={report?.severity??"MEDIUM"}><option>LOW</option><option>MEDIUM</option><option>HIGH</option><option>CRITICAL</option></select></div>
    <div><label className="label" htmlFor="report-cvss">CVSS score (0.0 to 10.0)</label><input id="report-cvss" className="input" name="cvssScore" type="number" step="0.1" min="0" max="10" defaultValue={report?.cvss_score??""} required/></div>
