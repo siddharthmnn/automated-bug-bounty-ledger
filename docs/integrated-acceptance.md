@@ -78,8 +78,8 @@ Record the commit SHA, browser/version, viewport sizes, test account roles (not 
 
 | Evidence | Status in this PR |
 | --- | --- |
-| Production HTTP flow and rendered page smoke checks | Automated in CI; result pending |
-| MySQL/Qdrant lifecycle and ownership checks | Automated in CI; existing integration/smoke coverage |
+| Production HTTP flow and rendered page smoke checks | Passed in CI run 43123609099 (run #63) |
+| MySQL/Qdrant integration and ownership checks | Passed in CI run 43123609099 (run #63) |
 | Real browser interaction and viewport checks | Requires a human browser run |
 | Screenshots from the real running application | Not captured by this GitHub-only workflow |
 | Remaining limitations | Record after the manual run; do not mark the demo fully accepted until completed |
