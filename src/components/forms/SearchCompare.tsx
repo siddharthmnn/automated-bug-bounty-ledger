@@ -27,7 +27,8 @@ export function SearchCompare() {
   </li>)}</ul>}
  </div>;
  return <div className="space-y-4"><form onSubmit={search} className="flex gap-2">
-  <input className="input" value={q} onChange={e=>setQ(e.target.value)} placeholder="Try: someone else can see my medical results" minLength={3} maxLength={200} required/>
+  <label className="sr-only" htmlFor="report-search-query">Search vulnerability reports</label>
+  <input id="report-search-query" className="input" value={q} onChange={e=>setQ(e.target.value)} placeholder="Try: someone else can see my medical results" minLength={3} maxLength={200} required/>
   <button className="btn btn-primary" disabled={busy}>{busy?"Searching...":"Search"}</button>
  </form><div className="grid gap-4 lg:grid-cols-2">
  {column("Keyword: MySQL FULLTEXT","MATCH(title, description) AGAINST(...) finds shared words.",keyword,"relevance")}
