@@ -13,7 +13,7 @@ export function useAction() {
  return {busy,error,message,run};
 }
 export function FormStatus({error,message}:{error:string|null;message?:string|null}) {
- if(error)return <p className="rounded-lg border border-bad/40 bg-bad/10 px-3 py-2 text-sm text-bad">{error}</p>;
- if(message)return <p className="rounded-lg border border-ok/40 bg-ok/10 px-3 py-2 text-sm text-ok">{message}</p>;
+ if(error)return <p role="alert" aria-live="assertive" className="rounded-lg border border-bad/40 bg-bad/10 px-3 py-2 text-sm text-bad">{error}</p>;
+ if(message)return <p role="status" aria-live="polite" className="rounded-lg border border-ok/40 bg-ok/10 px-3 py-2 text-sm text-ok">{message}</p>;
  return null;
 }

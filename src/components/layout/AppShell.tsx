@@ -19,6 +19,7 @@ const RESEARCHER_NAV:NavItem[]=[
 export function AppShell({user,children}:{user:SessionUser;children:React.ReactNode}) {
  const nav=user.role==="ADMIN"?ADMIN_NAV:RESEARCHER_NAV;
  return <div className="min-h-screen lg:grid lg:grid-cols-[240px_1fr]">
+  <a className="skip-link" href="#main-content">Skip to main content</a>
   <aside className="border-b border-line bg-panel lg:sticky lg:top-0 lg:h-screen lg:border-r lg:border-b-0">
    <div className="flex h-full flex-col gap-6 p-4">
     <Link href={user.role==="ADMIN"?"/admin":"/researcher"} className="flex items-center gap-2 px-2">
@@ -33,6 +34,6 @@ export function AppShell({user,children}:{user:SessionUser;children:React.ReactN
     </div>
    </div>
   </aside>
-  <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-8">{children}</main>
+  <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-7xl min-w-0 px-4 py-8 sm:px-8">{children}</main>
  </div>;
 }
