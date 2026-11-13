@@ -1,6 +1,6 @@
 # Application Evidence Screenshots
 
-Screenshots captured during local application validation on 12 November 2026.
+Screenshots captured during local application validation on 12–13 November 2026. All report and payout data shown are synthetic demonstration records.
 
 ## 1. Admin
 - `admin page.jpeg` — Admin dashboard and operational metrics.
@@ -17,9 +17,18 @@ Screenshots captured during local application validation on 12 November 2026.
 - `success message and report ID.jpeg` — Submission confirmation.
 
 ## 3. Workflow
+### Existing seeded workflow — report #312
 - `patch verification of 312 completed.jpeg` — Patch verification workflow.
 - `payout screen #1.jpeg` — Payout management.
 - `payout verified.jpeg` — Completed payout evidence.
+
+### Continuous end-to-end workflow — report #345
+The following five screenshots document the same synthetic report from admin acceptance through payout completion:
+- `01-report-345-accepted.jpeg` — Report #345 accepted by the platform admin.
+- `02-report-345-patch-recorded.jpeg` — Patch record created for report #345.
+- `03-report-345-patch-verified.jpeg` — Patch verification marked VERIFIED.
+- `04-report-345-payout-created.jpeg` — INR 1,500 payout created for the same report.
+- `05-report-345-payout-completed.jpeg` — Payout marked COMPLETED on 13 November 2026.
 
 ## 4. Database
 - `database roles.jpeg` — Database accounts and privilege assignments.
@@ -39,4 +48,4 @@ Screenshots captured during local application validation on 12 November 2026.
 - `responsive dimensions -2.jpeg`
 - `responsive dimensions -3.jpeg`
 
-These screenshots document the application's appearance at different viewport dimensions.
+These screenshots document the application's appearance at different viewport dimensions. They are evidence of the captured demonstration states, not a claim of a complete accessibility audit.
