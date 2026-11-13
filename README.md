@@ -1,34 +1,64 @@
 # Automated Bug Bounty Vulnerability Patch & Payout Ledger
 
-A centralized platform for vulnerability disclosure workflow: researcher submission, company review, patch verification and bounty payout tracking. It combines a relational ledger with vector-based semantic duplicate discovery.
+A web application for managing the bug bounty lifecycle — from researcher submission and admin review to patch verification and payout tracking.
 
-## Stack
+The project uses **MySQL as the source of truth** for application and financial records, with **Qdrant** providing semantic search for potentially similar vulnerability reports.
 
-- **Application:** Next.js 16, React 19, TypeScript
-- **Relational database:** MySQL 8.4 (authoritative source of truth)
-- **Vector database:** Qdrant (derived semantic index)
-- **Embeddings:** local Transformers.js Xenova/all-MiniLM-L6-v2 (384 dimensions)
-- **Validation/tests:** Zod, Vitest
-- **Local infrastructure:** Docker Compose
+![Report accepted](<docs/evidence/screenshots/workflow/01-report-345-accepted.jpeg>)
 
-## Core architecture
+## What the application does
 
-MySQL owns users, roles, companies, programs, researchers, vulnerability reports, status history, patches and payouts. Sensitive workflow operations use stored procedures and database constraints/triggers. Role-specific database accounts isolate authentication, administration, researcher access and vector synchronization.
+- Researchers register, browse programs, submit vulnerability reports and track their own submissions.
+- Administrators manage companies and programs, review reports, record patches, verify fixes and complete payouts.
+- Report status history supports auditability.
+- SQL analytics answer operational questions about reports, researchers, patches and payouts.
+- Semantic search helps identify potentially related reports. Search results are candidates; MySQL remains authoritative.
 
-Qdrant stores report vectors and filterable metadata only. The MySQL outbox tracks synchronization jobs; retries and reconciliation repair missing points, stale metadata and orphaned vectors. Report content and financial records remain in MySQL.
+## Screenshots
 
-Analytics group earnings and payout totals by currency. Values denominated in different currencies are not added or compared without an explicit FX conversion.
+| Researcher dashboard | Admin report queue |
+| --- | --- |
+| ![Researcher dashboard](<docs/evidence/screenshots/researcher/researcher dashboard.jpeg>) | ![Admin report queue](<docs/evidence/screenshots/admin/reports page in admin.jpeg>) |
 
-## Prerequisites
+| SQL analytics | Vector synchronization |
+| --- | --- |
+| ![SQL analytics](<docs/evidence/screenshots/analytics/q08.jpeg>) | ![Vector sync](<docs/evidence/screenshots/database/vector sync.jpeg>) |
 
-- Docker Engine / Docker Desktop with Compose
-- Node.js 22.12+ and npm
+See the [screenshot index](docs/evidence/screenshots/README.md) for the complete set. Screenshots use synthetic demonstration data.
 
-## Quick start
+## Technology
 
-~~~bash
+| Layer | Technology |
+| --- | --- |
+| Application | Next.js 16, React 19, TypeScript |
+| Relational database | MySQL 8.4 |
+| Vector database | Qdrant |
+| Embeddings | Transformers.js, `Xenova/all-MiniLM-L6-v2` (384 dimensions) |
+| Validation | Zod |
+| Local infrastructure | Docker Compose |
+
+## Data design
+
+MySQL stores users, roles, companies, programs, researchers, reports, status history, patches and payouts. Constraints, indexes, triggers, stored procedures and database grants protect important operations.
+
+Qdrant stores report embeddings and filterable metadata for semantic retrieval. A MySQL outbox records synchronization work; retries and reconciliation handle missed or stale entries. Qdrant is a derived index, not a replacement for MySQL.
+
+Financial analytics preserve currency boundaries. INR, USD and EUR amounts are grouped separately rather than added together without an exchange-rate policy.
+
+## Run locally
+
+### Requirements
+- Docker Engine or Docker Desktop with Compose
+- Node.js 22.12 or later
+- npm
+
+### Setup
+
+```bash
+git clone https://github.com/siddharthmnn/automated-bug-bounty-ledger.git
+cd automated-bug-bounty-ledger
 cp .env.example .env
-# Set MYSQL_ROOT_PASSWORD to a strong local password. Replace the four app-account passwords with distinct random 32+ character hexadecimal secrets (for example: openssl rand -hex 32).
+# Set strong local secrets in .env before starting the application.
 npm ci
 docker compose up -d
 npm run db:reset
@@ -36,53 +66,57 @@ npm run db:users
 npm run qdrant:init
 npm run vector:backfill
 npm run dev
-~~~
+```
 
-The local MySQL port is 3307; Qdrant REST/gRPC ports are 6333/6334. Services are bound to loopback for local development. Never expose the development database or unauthenticated Qdrant endpoint publicly.
+Open [http://localhost:3000](http://localhost:3000).
 
-**Destructive operation:** npm run db:reset drops and recreates the configured development database and reloads sample data. npm run test:db resets only the dedicated test database and test Qdrant collection. Never point these scripts at production.
+MySQL is exposed locally on port `3307`; Qdrant uses `6333` (HTTP) and `6334` (gRPC). Compose binds these services to loopback for local development.
+
+> **Important:** `npm run db:reset` drops and recreates the configured development database. `npm run test:db` resets the dedicated test database and test Qdrant collection. Use only disposable development/test data. Never point these commands at production.
 
 ## Useful commands
 
 | Command | Purpose |
 | --- | --- |
-| npm run db:up / npm run db:down | Start / stop local services |
-| npm run db:migrate | Apply pending migrations |
-| npm run db:reset | Destructively rebuild development DB and seed |
-| npm run db:users | Provision least-privilege MySQL users |
-| npm run qdrant:init | Create collection and payload indexes |
-| npm run vector:backfill | Index existing MySQL reports |
-| npm run vector:sync | Process pending outbox jobs |
-| npm run vector:reconcile | Compare MySQL and Qdrant state |
-| npm run lint / npm run typecheck | Static quality checks |
-| npm test / npm run test:db | Unit / DB-backed integration tests |
-| npm run build | Production build |
+| `npm run db:up` / `npm run db:down` | Start or stop local services |
+| `npm run db:migrate` | Apply pending migrations |
+| `npm run db:reset` | Rebuild development database and load seeds |
+| `npm run db:users` | Provision application database accounts |
+| `npm run qdrant:init` | Create vector collection and payload indexes |
+| `npm run vector:backfill` | Index existing reports |
+| `npm run vector:sync` | Process pending outbox jobs |
+| `npm run vector:reconcile` | Compare MySQL and Qdrant state |
+| `npm run lint` / `npm run typecheck` | Static checks |
+| `npm test` / `npm run test:db` | Unit and database-backed tests |
+| `npm run build` | Production build |
 
 ## Documentation
 
-- docs/phase2-architecture.md — architecture, design decisions and viva sequence
-- docs/er-diagram.md — Mermaid ER diagram and relationship cardinalities
-- docs/relational-schema.md — relational schema, keys and integrity constraints
-- docs/researcher-acceptance.md — researcher journey, authorization and responsive acceptance checklist
-- docs/session-security-regression.md — session lifecycle, role guards and cross-researcher ownership regression matrix
-- docs/researcher-workflow.md — account setup, report lifecycle and troubleshooting
-- docs/researcher-workflow.md — account setup, report lifecycle and troubleshooting
-- database/migrations/ — ordered SQL migrations
-- src/server/vector/ — vector synchronization implementation
-- src/server/services/analytics-catalogue-a.ts — SQL analytics catalogue
+Start with the [Documentation Index](docs/README.md).
 
-## Demo flow
+| Document | Contents |
+| --- | --- |
+| [DBMS Documentation](docs/dbms-documentation.md) | Database design, schema, integrity, security, SQL and vector storage |
+| [Demo Guide](docs/demo-guide.md) | Application and MySQL Workbench demonstration |
+| [ER Diagram](docs/er-diagram.md) | Entities and relationship cardinalities |
+| [Relational Schema](docs/relational-schema.md) | Tables, keys and integrity rules |
+| [DML and Query Guide](docs/dml-and-query-guide.md) | DML mapping and Q01–Q12 explanations |
+| [DBMS Validation](docs/evidence/dbms-validation.md) | Captured database validation and query plans |
+| [Application Evidence](docs/evidence/screenshots/README.md) | Screenshot index |
+| [Architecture](docs/phase2-architecture.md) | Components, request flow and design decisions |
 
-Admin manages companies/programs and triages reports. Researchers submit and track only their own reports. Accepted reports proceed through patch verification and payout recording. Semantic duplicate discovery uses Qdrant candidates, while MySQL remains authoritative for final workflow state.
+## Team responsibilities
 
-## Security and data handling
+| Member | Primary area |
+| --- | --- |
+| Siddharth Menon | Database design, SQL, backend services, database security and vector integration |
+| Tanisha D | Frontend walkthrough, integration, testing, validation evidence and documentation |
 
-- Seed records are synthetic demonstration data.
-- Never commit .env, passwords, private vulnerability disclosures or real payout details.
+Both members contributed to the project and its demonstration. This table describes the agreed division of responsibility; individual implementation history remains in GitHub commits and pull requests.
+
+## Scope and security
+
+- Seed and screenshot data are synthetic.
+- Do not commit `.env`, passwords, private vulnerability disclosures or real payout details.
 - Keep MySQL and Qdrant on trusted local/private networks.
-- This application manages disclosure workflow and ledger records; it does not autonomously patch external repositories.
-
-
-## Accessibility
-
-See [the accessibility and responsive UI audit](docs/accessibility-responsive-audit.md) for keyboard, form feedback and viewport checks.
+- The application manages disclosure workflow and payout records; it does not autonomously patch external repositories.
