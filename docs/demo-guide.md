@@ -82,7 +82,7 @@ Open the scripts in `database/queries/` or use the SQL analytics page.
 
 For earnings queries, point out that currency is part of the grouping or partitioning logic. INR, USD and EUR must not be treated as directly comparable values.
 
-## 7. Explain the architecture
+## 7. Architecture
 
 1. The Next.js interface sends a request to an authenticated API route.
 2. The backend validates the request and checks the session and application role.
@@ -91,9 +91,9 @@ For earnings queries, point out that currency is part of the grouping or partiti
 5. A vector worker processes outbox jobs and updates Qdrant.
 6. Semantic search retrieves candidate reports from Qdrant; final records and workflow state are resolved from MySQL.
 
-## 8. Suggested closing summary
+## 8. Closing summary
 
-"The project brings the bug bounty workflow and its payout records into one application. MySQL handles relational integrity, authorization-sensitive operations and the ledger. Qdrant adds semantic duplicate discovery without becoming the source of truth. The DBMS work is demonstrated through the schema, constraints, procedures, triggers, roles, transactions and twelve business-oriented SQL queries."
+The project brings the bug bounty workflow and its payout records into one application. MySQL handles relational integrity, authorization-sensitive operations and the ledger. Qdrant adds semantic duplicate discovery without becoming the source of truth. The DBMS work is demonstrated through the schema, constraints, procedures, triggers, roles, transactions and twelve business-oriented SQL queries.
 
 ## Evidence
 
